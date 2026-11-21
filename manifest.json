@@ -1,0 +1,9 @@
+{
+  "id": "table-focus",
+  "name": "Table Focus",
+  "version": "0.1.0",
+  "minAppVersion": "1.15.0",
+  "description": "Keep header rows and left columns in view in Reading view, and open a single table in full screen. In edit mode, view the table at the cursor with a command or the ribbon button.",
+  "author": "daisen4",
+  "isDesktopOnly": true
+}

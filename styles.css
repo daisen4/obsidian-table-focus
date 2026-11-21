@@ -1,0 +1,152 @@
+/* 自分の表示枠・表にだけ適用する。ノートの文字サイズ・余白は変えない。列幅は選択したときだけ調整する。 */
+.tf-box {
+  overflow: auto;
+  max-height: var(--tf-max-height);
+  position: relative;
+  isolation: isolate;
+}
+.tf-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  border-top: 1px solid var(--table-border-color, var(--background-modifier-border));
+  border-left: 1px solid var(--table-border-color, var(--background-modifier-border));
+}
+.tf-table.tf-table th, .tf-table.tf-table td {
+  border: 0;
+  border-right: 1px solid var(--table-border-color, var(--background-modifier-border));
+  border-bottom: 1px solid var(--table-border-color, var(--background-modifier-border));
+}
+/* 固定部分は、下を流れるセルが透けないよう不透明にする。
+   色はテーマの背景に文字色を少し混ぜて作り、交互色（背景色そのもの）とは別の色にする。
+   固定した行（見出し）は濃く、固定した列は各行の色に同じ割合を混ぜ、縞を保ったまま固定だけ分かるようにする。
+   Obsidian本体は偶数列の見出し・セルの背景を（優先度 0,2,2 で）上書きするため、クラスを重ねて上回らせる。 */
+.tf-table .tf-fz-r, .tf-table .tf-fz-c {
+  position: sticky;
+}
+.tf-table.tf-table .tf-fz-c {
+  left: var(--tf-left);
+  z-index: 20;
+  background-color: color-mix(in srgb, var(--background-primary) 94%, var(--text-normal));
+}
+.tf-table.tf-table .tf-fz-r {
+  top: var(--tf-top);
+  z-index: 30;
+  background-color: color-mix(in srgb, var(--background-primary) 82%, var(--text-normal));
+}
+.tf-table .tf-fz-r.tf-fz-c {
+  z-index: 40;
+}
+.tf-table.tf-zebra tbody tr:nth-child(even) td:not(.tf-fz-r):not(.tf-fz-c) {
+  background-color: var(--background-secondary);
+}
+.tf-table.tf-zebra tbody tr:nth-child(even) td.tf-fz-c:not(.tf-fz-r) {
+  background-color: color-mix(in srgb, var(--background-secondary) 94%, var(--text-normal));
+}
+.tf-bar {
+  position: sticky;
+  left: 0;
+  top: 0;
+  z-index: 50;
+  box-sizing: border-box;
+  width: 100%;
+  height: 36px;
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  background: var(--background-primary);
+}
+.tf-bar button {
+  margin: 0;
+  flex-shrink: 0;
+}
+.tf-bar span {
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tf-modal {
+  position: fixed;
+  inset: 0;
+  box-sizing: border-box;
+  width: 100vw;
+  max-width: 100vw;
+  height: 100dvh;
+  max-height: 100dvh;
+  margin: 0;
+  border-radius: 0;
+  padding: 12px;
+}
+.tf-modal .modal-close-button {
+  display: none;
+}
+.tf-modal .modal-content {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+}
+.tf-modal .tf-preview {
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  max-width: none;
+}
+.tf-modal .tf-box {
+  max-height: min(100%, var(--tf-max-height));
+}
+/* 強調: 該当のセルだけ。テーマの色変数に背景色を混ぜた不透明色にする。
+   固定セル・交互色・Obsidian本体の列色（優先度が高い）より必ず勝たせるため!importantを使う。 */
+.tf-table .tf-hl-red { background-color: color-mix(in srgb, var(--background-primary) 72%, var(--color-red)) !important; }
+.tf-table .tf-hl-yellow { background-color: color-mix(in srgb, var(--background-primary) 72%, var(--color-yellow)) !important; }
+.tf-table .tf-hl-green { background-color: color-mix(in srgb, var(--background-primary) 72%, var(--color-green)) !important; }
+.tf-table .tf-hl-blue { background-color: color-mix(in srgb, var(--background-primary) 72%, var(--color-blue)) !important; }
+
+/* 検索はバー内に収め、0件でも入力を続けられるようにする。 */
+.tf-bar .tf-search {
+  width: 180px;
+  min-width: 50px;
+  max-width: 45%;
+  height: 28px;
+  flex: 0 1 180px;
+}
+.tf-bar .tf-search-count { flex-shrink: 0; }
+.tf-table .tf-filtered-out { display: none !important; }
+
+/* 列幅調整: 自動レイアウトで範囲を付けて測定し、実測幅をロックする。
+   !importantはテーマや表のインライン幅指定に負けないため。オフではクラスごと外す。 */
+.tf-table.tf-widths {
+  table-layout: auto !important;
+  width: max-content !important;
+}
+.tf-table.tf-widths th, .tf-table.tf-widths td {
+  box-sizing: border-box;
+  min-width: var(--tf-min-width) !important;
+  max-width: var(--tf-max-width) !important;
+  white-space: normal !important;
+  overflow-wrap: anywhere;
+}
+.tf-table.tf-widths.tf-widths-locked {
+  table-layout: fixed !important;
+  width: var(--tf-table-width) !important;
+}
+.tf-table.tf-widths.tf-widths-locked th, .tf-table.tf-widths.tf-widths-locked td {
+  width: var(--tf-col-width) !important;
+  min-width: var(--tf-col-width) !important;
+  max-width: var(--tf-col-width) !important;
+}
+
+/* 枠幅に収める（FR-014）: 幅を測る間だけ表の最大幅を枠の幅にし、ブラウザの自動配分で列幅を決める。
+   測定中は単語の途中で折らず、実測を固定した後はセル内で折り返す（長い英単語も収める）。
+   固定後の規則を後ろに置くのは、同じ強さでこちらを勝たせるため。 */
+.tf-table.tf-widths.tf-fit:not(.tf-widths-locked) {
+  max-width: var(--tf-box-width) !important;
+}
+.tf-table.tf-widths.tf-fit th, .tf-table.tf-widths.tf-fit td {
+  overflow-wrap: break-word;
+}
+.tf-table.tf-widths.tf-fit.tf-widths-locked th, .tf-table.tf-widths.tf-fit.tf-widths-locked td {
+  overflow-wrap: anywhere;
+}
+
